@@ -14,6 +14,7 @@ func main() {
 
 	app := gin.Default()
 
+	//route
 	route.Setup(app)
 
 	app.Run(port)
