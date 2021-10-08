@@ -11,13 +11,13 @@ import (
 func Register(ctx *gin.Context) {
 	var data map[string]string
 
-	ctx.ShouldBindJSON(&data)
+	ctx.ShouldBind(&data)
 
-	pwd, _ := bcrypt.GenerateFromPassword([]byte(data["passward"]), 14)
+	pwd, _ := bcrypt.GenerateFromPassword([]byte(data["Password"]), 14)
 
 	user := &model.User{
-		UserName: data["userName"],
-		Email:    data["email"],
+		UserName: data["UserName"],
+		Email:    data["Email"],
 		Password: pwd,
 	}
 
