@@ -2,6 +2,7 @@ package controller
 
 import (
 	"go-jwt/model"
+	"go-jwt/server"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,7 @@ func Register(ctx *gin.Context) {
 		Password: pwd,
 	}
 
-	// server.UserRegister(user)
+	server.UserRegister(user)
 
 	ctx.JSON(http.StatusOK, user)
 }
