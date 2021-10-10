@@ -18,7 +18,7 @@ func UserRegister(user *model.User) {
 	stmt.Exec(user.UserName, user.Email, user.Password)
 }
 
-func UserLogin(data map[string]string) (string, error) {
+func GetToken(data map[string]string) (string, error) {
 	user, ok := loginCheck(data)
 
 	if !ok {

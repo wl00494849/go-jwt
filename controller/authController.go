@@ -31,7 +31,7 @@ func Login(ctx *gin.Context) {
 	var data map[string]string
 
 	ctx.ShouldBind(&data)
-	token, err := server.UserLogin(data)
+	token, err := server.GetToken(data)
 
 	if err != nil {
 		panic(err)
