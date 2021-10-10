@@ -1,11 +1,16 @@
 package server
 
 import (
-	"database/sql"
+	"errors"
 	"go-jwt/model"
+	"strconv"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
+
+const secretKey = "test"
 
 func UserRegister(user *model.User) {
 	stmt, err := Db.Prepare("Insert users set  UserName = ?,Email= ? ,Password = ? ")
@@ -13,17 +18,36 @@ func UserRegister(user *model.User) {
 	stmt.Exec(user.UserName, user.Email, user.Password)
 }
 
-func UserLogin(data map[string]string) {
+func UserLogin(data map[string]string) (string, error) {
+	user, ok := loginCheck(data)
 
-	pwd, err := bcrypt.GenerateFromPassword([]byte(data["Password"]), 14)
-	Err.CheckError(err)
+	if !ok {
+		err := errors.New("user not found")
+		return "", err
+	}
 
-	row := Db.QueryRow("Select users form jwt where UserName = ? , Password = ?", data["UserName"], pwd)
-	loginCheck(row)
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    strconv.Itoa(user.Id),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	token, err := claims.SignedString([]byte(secretKey))
+	return token, err
 }
 
-func loginCheck(row *sql.Row) {
-	var date map[string]string
-	row.Scan(date)
-	println("%+v", date)
+func loginCheck(data map[string]string) (*model.User, bool) {
+	var user = &model.User{}
+
+	row := Db.QueryRow("Select* from users where UserName = ? ", data["UserName"])
+	row.Scan(&user.Id, &user.UserName, &user.Email, &user.Password)
+
+	if user.Id == 0 {
+		return nil, false
+	}
+
+	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["Password"])); err != nil {
+		return nil, false
+	}
+
+	return user, true
 }
