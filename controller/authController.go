@@ -26,3 +26,11 @@ func Register(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, user)
 }
+
+func Login(ctx *gin.Context) {
+	var data map[string]string
+
+	ctx.ShouldBind(&data)
+	server.UserLogin(data)
+	ctx.JSON(200, data)
+}

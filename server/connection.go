@@ -26,5 +26,7 @@ func init() {
 	db.SetMaxIdleConns(2)
 	db.SetConnMaxLifetime(time.Hour)
 
+	Err.CheckError(db.Ping())
+
 	Db = db
 }
