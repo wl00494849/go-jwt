@@ -1,30 +1,20 @@
 package controller
 
 import (
-	"go-jwt/model"
 	"go-jwt/server"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(ctx *gin.Context) {
 	var data map[string]string
 
 	ctx.ShouldBind(&data)
+	server.UserRegister(data)
 
-	pwd, _ := bcrypt.GenerateFromPassword([]byte(data["Password"]), 14)
-
-	user := &model.User{
-		UserName: data["UserName"],
-		Email:    data["Email"],
-		Password: pwd,
-	}
-
-	server.UserRegister(user)
-
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, "success")
 }
 
 func Login(ctx *gin.Context) {
@@ -37,5 +27,17 @@ func Login(ctx *gin.Context) {
 		panic(err)
 	}
 
-	ctx.JSON(200, token)
+	ctx.SetCookie("jwt", token, int((time.Hour * 24).Seconds()), "/", "localhost", false, true)
+}
+
+func UserInfo(ctx *gin.Context) {
+	cookie, _ := ctx.Cookie("jwt")
+	user := server.GetUserInfo(cookie)
+
+	ctx.JSON(200, user)
+}
+
+func LoginOut(ctx *gin.Context) {
+	ctx.SetCookie("jwt", "", -1, "", "", false, true)
+	ctx.JSON(200, "message:success")
 }

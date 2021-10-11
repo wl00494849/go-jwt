@@ -19,4 +19,6 @@ func userGroup(app *gin.Engine) {
 
 	router.POST("/Register", controller.Register)
 	router.POST("/Login", controller.Login)
+	router.POST("/UserInfo", controller.UserInfo)
+	router.POST("/LoginOut", controller.LoginOut)
 }
